@@ -66,7 +66,7 @@ fn main() -> anyhow::Result<()> {
 
     let xdo = SendXDo(XDo::new(opts.display.as_deref())?);
 
-    let (client, _client_status) = jack::Client::new("aaa", ClientOptions::NO_START_SERVER)?;
+    let (client, _client_status) = jack::Client::new("jack_midi_xdo", ClientOptions::NO_START_SERVER)?;
     let midi_in = client.register_port("in", jack::MidiIn::default())?;
 
     let process = move |_client: &Client, ps: &ProcessScope| -> jack::Control {
