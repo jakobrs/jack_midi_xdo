@@ -4,7 +4,7 @@ use std::ops::Deref;
 use std::{collections::HashMap, path::PathBuf};
 
 use anyhow::Context;
-use jack::{Client, ClientOptions, ClosureProcessHandler, PortId, ProcessScope};
+use jack::{Client, ClientOptions, ClosureProcessHandler, ProcessScope};
 use libxdo::XDo;
 use serde::Deserialize;
 use serde_with::{serde_as, DisplayFromStr};
@@ -98,37 +98,8 @@ fn main() -> anyhow::Result<()> {
         jack::Control::Continue
     };
 
-    struct NotificationHandler;
-
-    impl jack::NotificationHandler for NotificationHandler {
-        fn ports_connected(
-            &mut self,
-            _: &Client,
-            port_id_a: PortId,
-            port_id_b: PortId,
-            are_connected: bool,
-        ) {
-            log::debug!(
-                "Ports {} and {} were {}",
-                port_id_a,
-                port_id_b,
-                if are_connected {
-                    "connected"
-                } else {
-                    "disconnected"
-                }
-            );
-        }
-
-        fn xrun(&mut self, _: &Client) -> jack::Control {
-            log::warn!("XRun");
-
-            jack::Control::Continue
-        }
-    }
-
     let _async_client =
-        client.activate_async(NotificationHandler, ClosureProcessHandler::new(process))?;
+        client.activate_async((), ClosureProcessHandler::new(process))?;
 
     // Just waits for enter to be pressed
     std::io::stdin().read_line(&mut String::new())?;
