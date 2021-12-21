@@ -2,14 +2,14 @@
 game = "Celeste"
 
 [keybinds]
-59 = "Tab" # For cheat code
-61 = "Escape"
+48 = "Tab" # For cheat code
+50 = "Escape"
 
-63 = "z"
-64 = "x"
-66 = "c"
+52 = "z"
+53 = "x"
+55 = "c"
 
-76 = "Left"
-78 = "Down"
-80 = "Up"
-82 = "Right"
+65 = "Left"
+67 = "Down"
+69 = "Up"
+71 = "Right"
