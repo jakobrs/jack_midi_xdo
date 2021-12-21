@@ -1,0 +1,18 @@
+[package]
+name = "jack_midi_xdo"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.51"
+jack = "0.8.4"
+libxdo = "0.6.0"
+serde = { version = "1.0.132", features = ["derive"] }
+serde_with = "1.11.0"
+structopt = "0.3.25"
+toml = "0.5.8"
+wmidi = "4.0.6"
+
+[features]

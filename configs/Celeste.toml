@@ -1,0 +1,15 @@
+[meta]
+game = "Celeste"
+
+[keybinds]
+59 = "Tab" # For cheat code
+61 = "Escape"
+
+63 = "z"
+64 = "x"
+66 = "c"
+
+76 = "Left"
+78 = "Down"
+80 = "Up"
+82 = "Right"
