@@ -7,8 +7,10 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.51"
+env_logger = "0.9.0"
 jack = "0.8.4"
 libxdo = "0.6.0"
+log = "0.4.14"
 serde = { version = "1.0.132", features = ["derive"] }
 serde_with = "1.11.0"
 structopt = "0.3.25"

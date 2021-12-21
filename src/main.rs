@@ -4,7 +4,7 @@ use std::ops::Deref;
 use std::{collections::HashMap, path::PathBuf};
 
 use anyhow::Context;
-use jack::{Client, ClientOptions, ClosureProcessHandler, ProcessScope};
+use jack::{Client, ClientOptions, ClosureProcessHandler, PortId, ProcessScope};
 use libxdo::XDo;
 use serde::Deserialize;
 use serde_with::{serde_as, DisplayFromStr};
@@ -48,6 +48,8 @@ impl Deref for SendXDo {
 }
 
 fn main() -> anyhow::Result<()> {
+    env_logger::builder().format_timestamp(None).init();
+
     let opts = Opts::from_args();
 
     let mut config_contents = Vec::new();
@@ -72,21 +74,23 @@ fn main() -> anyhow::Result<()> {
             match MidiMessage::try_from(msg.bytes) {
                 Ok(MidiMessage::NoteOn(_ch, note, _v)) => {
                     if let Some(action) = config.keybinds.get(&(note as u8)) {
-                        xdo.send_keysequence_down(action, 0)
-                            .expect("Unable to send keyseq down");
+                        if let Err(err) = xdo.send_keysequence_down(action, 0) {
+                            log::error!("Unable to send keyseq down: {:?}", err);
+                        }
                     } else {
-                        println!("Unmapped note {:?} ({})", note, note as u8);
+                        log::info!("Unmapped note {:?} ({})", note, note as u8);
                     }
                 }
                 Ok(MidiMessage::NoteOff(_ch, note, _v)) => {
                     if let Some(action) = config.keybinds.get(&(note as u8)) {
-                        xdo.send_keysequence_up(action, 0)
-                            .expect("Unable to send keyseq up");
+                        if let Err(err) = xdo.send_keysequence_up(action, 0) {
+                            log::error!("Unable to send keyseq up: {:?}", err);
+                        }
                     }
                 }
                 Ok(_) => {}
                 Err(err) => {
-                    eprintln!("Unable to parse MIDI message: {:?}", err);
+                    log::error!("Unable to parse MIDI message: {:?}", err);
                 }
             }
         }
@@ -94,7 +98,37 @@ fn main() -> anyhow::Result<()> {
         jack::Control::Continue
     };
 
-    let _async_client = client.activate_async((), ClosureProcessHandler::new(process))?;
+    struct NotificationHandler;
+
+    impl jack::NotificationHandler for NotificationHandler {
+        fn ports_connected(
+            &mut self,
+            _: &Client,
+            port_id_a: PortId,
+            port_id_b: PortId,
+            are_connected: bool,
+        ) {
+            log::debug!(
+                "Ports {} and {} were {}",
+                port_id_a,
+                port_id_b,
+                if are_connected {
+                    "connected"
+                } else {
+                    "disconnected"
+                }
+            );
+        }
+
+        fn xrun(&mut self, _: &Client) -> jack::Control {
+            log::warn!("XRun");
+
+            jack::Control::Continue
+        }
+    }
+
+    let _async_client =
+        client.activate_async(NotificationHandler, ClosureProcessHandler::new(process))?;
 
     // Just waits for enter to be pressed
     std::io::stdin().read_line(&mut String::new())?;
