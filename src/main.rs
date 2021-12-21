@@ -66,7 +66,8 @@ fn main() -> anyhow::Result<()> {
 
     let xdo = SendXDo(XDo::new(opts.display.as_deref())?);
 
-    let (client, _client_status) = jack::Client::new("jack_midi_xdo", ClientOptions::NO_START_SERVER)?;
+    let (client, _client_status) =
+        jack::Client::new("jack_midi_xdo", ClientOptions::NO_START_SERVER)?;
     let midi_in = client.register_port("in", jack::MidiIn::default())?;
 
     let process = move |_client: &Client, ps: &ProcessScope| -> jack::Control {
@@ -98,8 +99,7 @@ fn main() -> anyhow::Result<()> {
         jack::Control::Continue
     };
 
-    let _async_client =
-        client.activate_async((), ClosureProcessHandler::new(process))?;
+    let _async_client = client.activate_async((), ClosureProcessHandler::new(process))?;
 
     // Just waits for enter to be pressed
     std::io::stdin().read_line(&mut String::new())?;
