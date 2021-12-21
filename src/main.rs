@@ -78,7 +78,7 @@ fn main() -> anyhow::Result<()> {
                             log::error!("Unable to send keyseq down: {:?}", err);
                         }
                     } else {
-                        log::info!("Unmapped note {:?} ({})", note, note as u8);
+                        log::info!("Unmapped note {:?}", note);
                     }
                 }
                 Ok(MidiMessage::NoteOff(_ch, note, _v)) => {
