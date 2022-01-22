@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::io::Read;
+use std::fs;
 use std::ops::Deref;
 use std::{collections::HashMap, path::PathBuf};
 
@@ -52,10 +51,7 @@ fn main() -> anyhow::Result<()> {
 
     let opts = Opts::from_args();
 
-    let mut config_contents = Vec::new();
-    File::open(opts.config)
-        .context("config.toml does not exist")?
-        .read_to_end(&mut config_contents)?;
+    let config_contents = fs::read(opts.config).context("config.toml does not exist")?;
     let config: Config = toml::from_slice(config_contents.as_slice())?;
 
     if let Some(meta) = config.meta {
